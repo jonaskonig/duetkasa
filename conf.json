@@ -1,0 +1,7 @@
+{
+  "duet_ip" : "",
+  "kasa_ip" : "",
+  "maxheatertemp" : "60",
+  "timebeforshutdown" : "15"
+
+}
