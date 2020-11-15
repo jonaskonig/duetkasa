@@ -36,3 +36,8 @@ while True:
                 if timer < datetime.now():
                     asyncio.run(plug.turn_off())
                     timer = None
+        else:
+            timer = None
+    else:
+        timer = None
+    time.sleep(1)
