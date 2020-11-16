@@ -50,9 +50,10 @@ def rungcode(DSFsock):
     print(r)
     response = json.loads(r)
     print(response)
-    response = json_data['response']
+    response = response['result']
     response = json.loads(response)
     state = response['status']
+    print(state)
     heatertemp = response['heaters'][1]
     return(dict(status = status, htemp = heatertemp))
 
