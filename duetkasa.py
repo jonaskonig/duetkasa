@@ -21,6 +21,7 @@ def initial():
         heatermaxtemp = int(data["maxheatertemp"])
     plug = SmartPlug(plugip)
     DSFsock = openDSF()
+    check(waittime,heatermaxtemp)
 
 
 def check(waittime,maxheatertemp):
