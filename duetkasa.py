@@ -27,7 +27,7 @@ def initial():
 def check(waittime,maxheatertemp,plug,DSFsock):
     asyncio.run(plug.update())
     if plug.is_on:
-        data = rungcode()
+        data = rungcode(DSFsock)
         status = data["status"]
         heatertemp = data["htemp"]
         timer = timer.Timer(waittime)
