@@ -51,4 +51,4 @@ def rungcode():
     response = json.loads(response)
     state = response['status']
     heatertemp = response['heaters'][1]
-    return(dict(status : status, htemp : heatertemp))
+    return(dict(status = status, htemp = heatertemp))
