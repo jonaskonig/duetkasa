@@ -8,7 +8,7 @@ def openDSF():
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     s.connect('/var/run/dsf/dcs.sock')
     s.setblocking(True)
-    j=json.dumps({"mode":"command"}).encode()
+    j=json.dumps({"mode":"command","version": 8}).encode()
     s.send(j)
     r=s.recv(128).decode()
     if (-1 == r.find('{"version":')):
