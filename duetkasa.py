@@ -47,9 +47,7 @@ def check(waittime,maxheatertemp,plug,DSFsock):
 
 def rungcode(DSFsock):
     r=Gcode(DSFsock,'M408')
-    print(r)
     response = json.loads(r)
-    print(response)
     response = response['result']
     response = json.loads(response)
     state = response['status']
