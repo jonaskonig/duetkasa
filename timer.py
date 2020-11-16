@@ -6,4 +6,4 @@ class Timer:
         self.timetimer = datetime.now() + timedelta(minutes=minutes)
 
     def timer_up(self):
-        return (self.timetimer <= datetime.now():)
+        return (self.timetimer <= datetime.now())
