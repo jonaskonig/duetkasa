@@ -7,7 +7,7 @@ from kasa import SmartPlug
 from datetime import datetime
 from datetime import timedelta
 from DWClib import *
-import timer
+import timer as counter
 waittime = 1
 heatermaxtemp = None
 plugip = None
@@ -30,7 +30,7 @@ def check(waittime,maxheatertemp,plug,DSFsock):
         data = rungcode(DSFsock)
         status = data["status"]
         heatertemp = data["htemp"]
-        timer = timer.Timer(waittime)
+        timer = counter.Timer(waittime)
         while status == "I" and heatertemp <= heatermaxtemp:
             if timer.timer_up():
                 asyncio.run(turn_off())
