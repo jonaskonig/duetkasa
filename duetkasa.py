@@ -53,3 +53,5 @@ def rungcode():
     state = response['status']
     heatertemp = response['heaters'][1]
     return(dict(status = status, htemp = heatertemp))
+
+initial()
