@@ -31,7 +31,7 @@ def check(waittime,maxheatertemp,plug,DSFsock):
         status = data["status"]
         heatertemp = data["htemp"]
         timer = counter.Timer(waittime)
-        while status == "I" and heatertemp <= heatermaxtemp:
+        while status == "I" and heatertemp <= maxheatertemp:
             if timer.timer_up():
                 asyncio.run(turn_off())
                 break
