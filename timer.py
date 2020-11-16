@@ -2,7 +2,7 @@ from datetime import datetime
 from datetime import timedelta
 
 class Timer:
-    def __init__(minutes):
+    def __init__(self, minutes):
         self.minutes = datetime.now() + timedelta(minutes=minutes)
 
     def timer_up(self):
