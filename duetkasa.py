@@ -6,38 +6,49 @@ import requests
 from kasa import SmartPlug
 from datetime import datetime
 from datetime import timedelta
-from duetwebapi import DuetWebAPI
-timer = None;
+from DWClib import *
+import timer
 waittime = 1
 heatermaxtemp = None
 plugip = None
-duet_host = None
-with open('conf.json') as json_file:
-    data = json.load(json_file)
-    duet_host = data["duet_ip"]
-    plugip = data["kasa_ip"]
-    waittime = int(data["timebeforshutdown"])
-    heatermaxtemp = int(data["maxheatertemp"])
-printer = DuetWebAPI("http://"+duet_host)
-plug = SmartPlug(plugip)
-while True:
+
+
+def initial():
+    with open('conf.json') as json_file:
+        data = json.load(json_file)
+        plugip = data["kasa_ip"]
+        waittime = int(data["timebeforshutdown"])
+        heatermaxtemp = int(data["maxheatertemp"])
+    plug = SmartPlug(plugip)
+    DSFsock = openDSF()
+
+
+def check(waittime,maxheatertemp):
     asyncio.run(plug.update())
     if plug.is_on:
-        json_data = printer.send_code("M408")
-        response = json_data['response']
-        response = json.loads(response)
-        status = response['status']
-        heatertemp = response['heaters'][1]
-        #print(heatertemp)
-        if status == "I" and heatertemp <= heatermaxtemp:
-            if timer == None:
-                timer = datetime.now()+timedelta(minutes=waittime)
+        data = rungcode()
+        status = data["status"]
+        heatertemp = data["htemp"]
+        timer = timer.Timer(waittime)
+        while status == "I" and heatertemp <= heatermaxtemp:
+            if timer.timer_up():
+                asyncio.run(turn_off())
+                break
             else:
-                if timer < datetime.now():
-                    asyncio.run(plug.turn_off())
-                    timer = None
-        else:
-            timer = None
-    else:
-        timer = None
-    time.sleep(1)
+                data = rungcode()
+                status = data["status"]
+                heatertemp = data["htemp"]
+            time.sleep(1)
+    time.sleep(4)
+    check(waittime,maxheatertemp)
+
+
+
+def rungcode():
+    r=Gcode(DSFsock,'M408')
+    response = json.loads(response)
+    response = json_data['response']
+    response = json.loads(response)
+    state = response['status']
+    heatertemp = response['heaters'][1]
+    return(dict(status : status, htemp : heatertemp))
