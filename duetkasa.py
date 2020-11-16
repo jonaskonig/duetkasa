@@ -55,6 +55,6 @@ def rungcode(DSFsock):
     state = response['status']
     print(state)
     heatertemp = response['heaters'][1]
-    return(dict(status = status, htemp = heatertemp))
+    return(dict(status = state, htemp = heatertemp))
 
 initial()
