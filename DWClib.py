@@ -7,6 +7,7 @@ import json
 def openDSF():
     s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     s.connect('/var/run/dsf/dcs.sock')
+    s.setblocking(True)
     j=json.dumps({"mode":"command"}).encode()
     s.send(j)
     r=s.recv(128).decode()
