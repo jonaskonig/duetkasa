@@ -3,7 +3,7 @@ from datetime import timedelta
 
 class Timer:
     def __init__(minutes):
-        self.timetimer = datetime.now() + timedelta(minutes=minutes)
+        self.minutes = datetime.now() + timedelta(minutes=minutes)
 
     def timer_up(self):
-        return (self.timetimer <= datetime.now())
+        return (self.minutes <= datetime.now())
