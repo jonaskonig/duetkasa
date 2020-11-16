@@ -21,10 +21,10 @@ def initial():
         heatermaxtemp = int(data["maxheatertemp"])
     plug = SmartPlug(plugip)
     DSFsock = openDSF()
-    check(waittime,heatermaxtemp)
+    check(waittime,heatermaxtemp,plug,DSFsock)
 
 
-def check(waittime,maxheatertemp):
+def check(waittime,maxheatertemp,plug,DSFsock):
     asyncio.run(plug.update())
     if plug.is_on:
         data = rungcode()
@@ -36,16 +36,16 @@ def check(waittime,maxheatertemp):
                 asyncio.run(turn_off())
                 break
             else:
-                data = rungcode()
+                data = rungcode(DSFsock)
                 status = data["status"]
                 heatertemp = data["htemp"]
             time.sleep(1)
     time.sleep(4)
-    check(waittime,maxheatertemp)
+    check(waittime,maxheatertemp,plug,DSFsock)
 
 
 
-def rungcode():
+def rungcode(DSFsock):
     r=Gcode(DSFsock,'M408')
     response = json.loads(response)
     response = json_data['response']
