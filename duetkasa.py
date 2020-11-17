@@ -6,54 +6,58 @@ import requests
 from kasa import SmartPlug
 from datetime import datetime
 from datetime import timedelta
-from DWClib import *
+import DuetWebAPI as DWA
 import timer as counter
 waittime = 1
 heatermaxtemp = None
-plugip = None
-
-
 def initial():
     with open('conf.json') as json_file:
         data = json.load(json_file)
-        plugip = data["kasa_ip"]
+        plug = SmartPlug(data["kasa_ip"])
         waittime = int(data["timebeforshutdown"])
         heatermaxtemp = int(data["maxheatertemp"])
-    plug = SmartPlug(plugip)
-    check(waittime,heatermaxtemp,plug)
+        printer = DWA.DuetWebAPI("http://"+data["duet_ip"])
+        print(printer.getStatus)
+    check(waittime,heatermaxtemp,plug,printer)
 
 
-def check(waittime,maxheatertemp,plug):
+def check(waittime,maxheatertemp,plug,printer):
+    timer = counter.Timer(waittime)
     asyncio.run(plug.update())
-    if plug.is_on:
-        data = rungcode()
-        status = data["status"]
-        heatertemp = data["htemp"]
-        timer = counter.Timer(waittime)
-        while status == "I" and heatertemp <= maxheatertemp:
-            if timer.timer_up():
-                asyncio.run(plug.turn_off())
-                break
-            else:
-                data = rungcode()
-                status = data["status"]
-                heatertemp = data["htemp"]
-            time.sleep(1)
-    time.sleep(4)
-    check(waittime,maxheatertemp,plug)
+    emeterdata = asyncio.run(plug.get_emeter_realtime())
+    write_data(emeterdata)
+    if plug.is_on and emeterdata["power"] < 20:
+        print(emeterdata["power"])
+        print(printer.getStatus)
+        if printer.getStatus == "idle":
+
+                while printer.getTemperatures[1]["lastReading"] <= maxheatertemp and printer.getStatus == "idle":
+                    asyncio.run(plug.update())
+                    emeterdata = asyncio.run(plug.get_emeter_realtime())
+                    write_data(emeterdata)
+                    if timer.timer_up():
+                        asyncio.run(plug.turn_off())
+                        break
+                    else:
+                        print("Not there jet")
+                        time.sleep(1)
+    print("Sleeping!")
+    #time.sleep(1)
+    check(waittime,maxheatertemp,plug,printer)
+
+def write_data(emeterdata):
+    emeterdata["time"] = str(datetime.now())
+    with open("data.json") as datain:
+        data = json.load(datain)
+    if data:
+        data["reading"].append(emeterdata)
+    else:
+        data = {}
+        data["reading"] = []
+        data["reading"].append(emeterdata)
+    with open("data.json", "w") as dataout:
+        json.dump(data,dataout)
 
 
-
-def rungcode():
-    DSFsock = openDSF()
-    r=Gcode(DSFsock,'M408')
-    closeDSF(DSFsock)
-    response = json.loads(r)
-    response = response['result']
-    response = json.loads(response)
-    state = response['status']
-    print(state)
-    heatertemp = response['heaters'][1]
-    return(dict(status = state, htemp = heatertemp))
 
 initial()

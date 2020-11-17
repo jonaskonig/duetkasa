@@ -1,5 +1,6 @@
 {
-  "kasa_ip" : "",
+  "kasa_ip" : "192.168.34.67",
+  "duet_ip" : "192.168.34.27",
   "maxheatertemp" : "60",
   "timebeforshutdown" : "15"
 
