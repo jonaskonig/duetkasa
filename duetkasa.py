@@ -17,8 +17,7 @@ def initial():
         waittime = int(data["timebeforshutdown"])
         heatermaxtemp = int(data["maxheatertemp"])
         printer = DWA.DuetWebAPI("http://"+data["duet_ip"])
-        print(printer.getStatus)
-    check(waittime,heatermaxtemp,plug,printer)
+        check(waittime,heatermaxtemp,plug,printer)
 
 
 def check(waittime,maxheatertemp,plug,printer):
@@ -28,10 +27,9 @@ def check(waittime,maxheatertemp,plug,printer):
     write_data(emeterdata)
     if plug.is_on and emeterdata["power"] < 20:
         print(emeterdata["power"])
-        print(printer.getStatus)
-        if printer.getStatus == "idle":
-
-                while printer.getTemperatures[1]["lastReading"] <= maxheatertemp and printer.getStatus == "idle":
+        if printer.getStatus() == "idle":
+                print(printer.getStatus())
+                while printer.getTemperatures()[1]["lastReading"] <= maxheatertemp and printer.getStatus() == "idle":
                     asyncio.run(plug.update())
                     emeterdata = asyncio.run(plug.get_emeter_realtime())
                     write_data(emeterdata)
@@ -48,13 +46,14 @@ def check(waittime,maxheatertemp,plug,printer):
 def write_data(emeterdata):
     emeterdata["time"] = str(datetime.now())
     with open("data.json") as datain:
-        data = json.load(datain)
-    if data:
-        data["reading"].append(emeterdata)
-    else:
-        data = {}
-        data["reading"] = []
-        data["reading"].append(emeterdata)
+        try:
+            data = json.load(datain)
+            data["reading"].append(emeterdata)
+        except:
+            print("vermutlich leer!")
+            data = {}
+            data["reading"] = []
+            data["reading"].append(emeterdata)
     with open("data.json", "w") as dataout:
         json.dump(data,dataout)
 
