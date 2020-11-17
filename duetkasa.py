@@ -20,7 +20,7 @@ def initial():
         waittime = int(data["timebeforshutdown"])
         heatermaxtemp = int(data["maxheatertemp"])
     plug = SmartPlug(plugip)
-    check(waittime,heatermaxtemp,plug,DSFsock)
+    check(waittime,heatermaxtemp,plug)
 
 
 def check(waittime,maxheatertemp,plug):
@@ -40,7 +40,7 @@ def check(waittime,maxheatertemp,plug):
                 heatertemp = data["htemp"]
             time.sleep(1)
     time.sleep(4)
-    check(waittime,maxheatertemp,plug,DSFsock)
+    check(waittime,maxheatertemp,plug)
 
 
 
